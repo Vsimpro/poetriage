@@ -1,13 +1,14 @@
 # Poetriage
 
-Poetriage is a highly configurable, on-prem enabled LLM orchestrated **Malware Analysis** tool, packaged with a nice UI. 
+Poetriage aims to be a highly configurable, on-prem enabled LLM orchestrated **Malware Analysis** tool, packaged with a nice UI for automated workflows. 
 
 ![](./images/poetriage.png)
 
-## NOTE: This product is still in early development.
-The happy userflows have been tested to work, but bugs may arise. 
 
-API changes may and will happen.
+> [!IMPORTANT]
+> This product is still in early development.
+> The happy userflows have been tested to work, but bugs may arise. 
+> API changes may and will happen.
 
 If you would be so kind to report them as they pop up, I would be more than happy to fix them!
 
@@ -22,6 +23,11 @@ Poetriage can also be run completely locally, on premises. If you serve your own
 
 During testing, cost and time per analysis was between 2 - 10 cents USD, and 5 - 20 mins per file, depending on size.
 
+**So why use LLMs?** Thats two-fold. 
+1) Automated sandboxes for testing are already available, but as we know, malware developers try to make their work "undetected" by fine tuning against detections. LLM as an investigator aims to give us some flexibility in this regard, as the tools used to detect potentially harmful software are not hard coded in.
+2) This is in part a test to see how well we can integrate LLMs into our daily workflows, and an attempt to find where we can reap benefits in using them. They should act as force multiplier, and this project aims as a demo of one potential aspect of that.
+
+
 ## Installation
 
 Plug in your keys & endpoints into .env. **After the first load, the database is the source of truth, and .env changes will not override the database** as long as it exists.
@@ -29,7 +35,6 @@ Plug in your keys & endpoints into .env. **After the first load, the database is
 Deploying with docker:
 ```sh
 cp .env.md .env
-
 # Edit PI_OPENROUTER_API_KEY and PI_MODEL in .env.
 docker compose up --build
 ```
@@ -63,10 +68,10 @@ MCP:
 npm install -g @remnux/mcp-server@0.1.70
 ```
 
-### ! Note: If you run the worker locally, it runs the agent on your machine without a sandbox.
-Prefer mostly Docker, if you can.
-
-Be especially careful with old, small models, as they may do unexpected actions on the host they're running on. Frontier models seem generally safe to use like this. 
+> [!CAUTION]
+> If you run the worker locally, it runs the agent on your machine without a sandbox.
+> Prefer mostly Docker, if you can.
+> Be especially careful with old, small models, as they may do unexpected actions on the host they're running on. Frontier models seem generally safe to use like this. 
 
 The agentic workflows are built around the use of [Pi-agent](https://github.com/earendil-works/pi). Already have Pi configured? You can import your wanted config files to the project. Copy the config files you want to keep
 (`models.json`, `settings.json`, `mcp.json`, `auth.json`) into
@@ -77,7 +82,6 @@ Don't have Pi yet? If you run Poetriage inside docker, one will be assigned to y
 ## Modifying pi-config to your liking.
 
 After the first run, Pi runtime/config files are generated under `./data/pi-agent` and sessions under `./data/pi-sessions`. You can tune them to your liking after first load.
-
 
 ## Usage
 
@@ -117,4 +121,5 @@ During testing, deepseek v4 flash, GLM 5.3 flash and Ornith 1.5-9B were used. Wi
 ## Contributing & feedback
 If you wish to contribute, open up a pull request.
 
-For any and all feedback (positive, negative, constructive or not) you can contact me on my socials!
+> [!TIP]
+> For any and all feedback (positive, negative, constructive or not) you can contact me on my socials!
