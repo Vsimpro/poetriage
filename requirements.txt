@@ -1,0 +1,7 @@
+flask
+flask-cors
+werkzeug
+docker
+gunicorn
+mcp
+openai
