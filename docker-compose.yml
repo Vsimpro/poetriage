@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: api/Dockerfile
     image: poetriage-api:local
-    container_name: poetriage-api_3
+    container_name: poetriage-api
     ports:
       - "${HOST_PORT:-5000}:5000"
     environment:
@@ -32,7 +32,7 @@ services:
       context: .
       dockerfile: Dockerfile.worker
     image: poetriage-worker:local
-    container_name: poetriage-worker_3
+    container_name: poetriage-worker
     depends_on:
       - api
     environment:
