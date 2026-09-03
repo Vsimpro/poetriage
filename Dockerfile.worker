@@ -1,0 +1,38 @@
+FROM node:22-bookworm-slim AS node-runtime
+
+FROM docker:27-cli AS docker-cli
+
+FROM python:3.12-slim-bookworm AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DATABASE_PATH=/data/database.db \
+    UPLOAD_DIR=/data/uploads \
+    PI_CODING_AGENT_DIR=/data/pi-agent \
+    PI_CODING_AGENT_SESSION_DIR=/data/pi-sessions \
+    PI_REPORT_TOOL=/app/pi-report-tool/index.ts
+
+WORKDIR /app
+
+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
+COPY --from=node-runtime /usr/local/lib/node_modules /usr/local/lib/node_modules
+COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
+
+RUN ln -sf ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -sf ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
+    && npm install -g @earendil-works/pi-coding-agent@0.84.3 @remnux/mcp-server@0.1.70
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY analysis_worker.py ./analysis_worker.py
+COPY api ./api
+COPY src ./src
+COPY prompts ./prompts
+COPY pi-report-tool ./pi-report-tool
+
+RUN cd /app/pi-report-tool && npm install --omit=dev
+
+RUN mkdir -p /data/uploads /data/pi-agent /data/pi-sessions /app/reports
+
+CMD ["python", "analysis_worker.py", "--database", "/data/database.db", "--uploads", "/data/uploads"]

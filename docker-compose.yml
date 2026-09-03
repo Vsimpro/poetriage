@@ -1,0 +1,54 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    image: poetriage-api:local
+    container_name: poetriage-api_3
+    ports:
+      - "${HOST_PORT:-5000}:5000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 5000
+      DATABASE_PATH: /data/database.db
+      UPLOAD_DIR: /data/uploads
+      SECRET_KEY_FILE: /data/.secret_key
+      ADMIN_CREDS_FILE: /data/admin_credentials.txt
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-200}
+      PI_CODING_AGENT_DIR: /data/pi-agent
+      PI_PROVIDER: ${PI_PROVIDER:-openrouter}
+      PI_MODEL: ${PI_MODEL:-z-ai/glm-5.3-flash}
+      PI_OPENROUTER_API_KEY: ${PI_OPENROUTER_API_KEY:-}
+      PI_OPENROUTER_BASE_URL: ${PI_OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      PI_REMNUX_CONTAINER: ${PI_REMNUX_CONTAINER:-remnux-pi}
+      PI_REMNUX_TIMEOUT: ${PI_REMNUX_TIMEOUT:-600}
+    volumes:
+      - ./data:/data
+      - ./reports:/app/reports
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: poetriage-worker:local
+    container_name: poetriage-worker_3
+    depends_on:
+      - api
+    environment:
+      DATABASE_PATH: /data/database.db
+      UPLOAD_DIR: /data/uploads
+      PI_CODING_AGENT_DIR: /data/pi-agent
+      PI_CODING_AGENT_SESSION_DIR: /data/pi-sessions
+      PI_REPORT_TOOL: /app/pi-report-tool/index.ts
+      PI_PROVIDER: ${PI_PROVIDER:-openrouter}
+      PI_MODEL: ${PI_MODEL:-z-ai/glm-5.3-flash}
+      PI_OPENROUTER_API_KEY: ${PI_OPENROUTER_API_KEY:-}
+      PI_OPENROUTER_BASE_URL: ${PI_OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      PI_REMNUX_CONTAINER: ${PI_REMNUX_CONTAINER:-remnux-pi}
+      PI_REMNUX_TIMEOUT: ${PI_REMNUX_TIMEOUT:-600}
+    volumes:
+      - ./data:/data
+      - ./reports:/app/reports
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
